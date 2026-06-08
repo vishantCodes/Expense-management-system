@@ -1,0 +1,35 @@
+
+.auth-layout {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #f8f9fa;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    padding: 2rem;
+
+    border: 1px solid #e9ecef;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.08);
+}
+
+.auth-input {
+    height: 48px;
+    border-radius: 10px;
+}
+
+.auth-input:focus {
+    border-color: #4723D9;
+    box-shadow: 0 0 0 .2rem rgba(71,35,217,.15);
+}
