@@ -48,24 +48,30 @@
 
                 <button type="button"
                     class="nav_link d-flex justify-content-between align-items-center w-100 border-0 bg-transparent"
-                    data-bs-toggle="collapse" data-bs-target="#vendorSubmenu" aria-expanded="false"
-                    aria-controls="vendorSubmenu">
+                    data-bs-toggle="collapse" data-bs-target="#departmentSubmenu" aria-expanded="false"
+                    aria-controls="departmentSubmenu">
                     <div>
-                        <i class='bx bx-user-pin nav_icon'></i>
-                        <span class="nav_name">Vendors</span>
+                        <i class='bx bx-building nav_icon'></i>
+                        <span class="nav_name">Departments</span>
                     </div>
                     <i class='bx bx-chevron-down nav_arrow_icon small'></i>
                 </button>
 
-                <ul class="collapse list-unstyled ps-4 ms-2 border-start" id="vendorSubmenu">
+                <ul class="collapse list-unstyled ps-4 ms-2 border-start" id="departmentSubmenu">
+                    @role('super-admin')
                     <li class="py-1">
-                        <a href="{{ route('admin.vendor.create') }}"
+                        <a href="{{ route('admin.department.create') }}"
                             class="nav_link text-decoration-none py-1 small">Add</a>
                     </li>
                     <li class="py-1">
-                        <a href="{{ route('admin.vendor.index') }}"
+                        <a href="{{ route('admin.department.index') }}"
                             class="nav_link text-decoration-none py-1 small">List</a>
                     </li>
+                    <li class="py-1">
+                        <a href="{{ route('admin.department.budget.index') }}"
+                            class="nav_link text-decoration-none py-1 small">Budgets</a>
+                    </li>
+                    @endrole
                 </ul>
 
                 <button type="button"

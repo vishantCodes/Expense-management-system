@@ -4,6 +4,10 @@ namespace App\Models;
 
 use App\Enums\ExpenseTypeEnum;
 use App\Models\Department;
+use App\Models\ExpenseApprovals;
+use App\Models\ExpenseComments;
+use App\Models\ExpenseQuery;
+use App\Models\ExpenseRejection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -52,6 +56,26 @@ class Expense extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(ExpenseAttachements::class);
+    }
+
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(ExpenseApprovals::class, 'expense_id');
+    }
+
+    public function rejections(): HasMany
+    {
+        return $this->hasMany(ExpenseRejection::class, 'expense_id');
+    }
+
+    public function queries(): HasMany
+    {
+        return $this->hasMany(ExpenseQuery::class, 'expense_id');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ExpenseComments::class, 'expense_id');
     }
 
     public function user(): BelongsTo

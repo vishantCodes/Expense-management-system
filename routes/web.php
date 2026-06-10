@@ -2,8 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DepartmentBudgetController;
 use App\Http\Controllers\ExpenseApprovalController;
+use App\Http\Controllers\ExpenseCommentController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ExpenseQueryController;
 use App\Http\Controllers\ExpenseRejectionController;
 use App\Http\Middleware\EditExpensePermissionCheck;
 use Illuminate\Support\Facades\Route;
@@ -34,8 +38,23 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
         Route::post('approve/{expense}', [ExpenseApprovalController::class, 'store'])->name('approve');
         Route::post('reject/{expense}', [ExpenseRejectionController::class, 'store'])->name('reject');
-        Route::post('store/query/{expense}', [ExpenseRejectionController::class, 'store'])->name('store.query');
-        Route::post('store/comment/{expense}', [ExpenseRejectionController::class, 'store'])->name('store.comment');
+        Route::post('store/query/{expense}', [ExpenseQueryController::class, 'store'])->name('store.query');
+        Route::post('store/comment/{expense}', [ExpenseCommentController::class, 'store'])->name('store.comment');
+    });
+
+    Route::prefix('department')->name('department.')->group(function () {
+        Route::get('/', [DepartmentController::class, 'index'])->name('index');
+        Route::get('create', [DepartmentController::class, 'create'])->name('create');
+        Route::post('store', [DepartmentController::class, 'store'])->name('store');
+        Route::get('show/{department}', [DepartmentController::class, 'show'])->name('show');
+        Route::get('edit/{department}', [DepartmentController::class, 'edit'])->name('edit');
+        Route::put('update/{department}', [DepartmentController::class, 'update'])->name('update');
+        Route::delete('destroy/{department}', [DepartmentController::class, 'destroy'])->name('destroy');
+
+        Route::prefix('budget')->name('budget.')->group(function () {
+            Route::get('/', [DepartmentBudgetController::class, 'index'])->name('index');
+            Route::post('store', [DepartmentBudgetController::class, 'store'])->name('store');
+        });
     });
 
     Route::prefix('vendor')->name('vendor.')->group(function () {

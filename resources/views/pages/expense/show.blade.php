@@ -38,6 +38,81 @@
             </div>
         </div>
 
+        @if($expense->approvals && $expense->approvals->isNotEmpty())
+            <hr>
+            <h6>Approvals</h6>
+            <div class="list-group mb-3">
+                @foreach($expense->approvals as $approval)
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>Approved By:</strong> {{ $approval->approver?->name ?? '-' }}
+                            </div>
+                            <span class="badge bg-success text-capitalize">{{ $approval->status }}</span>
+                        </div>
+                        <p class="mb-1"><strong>Amount:</strong> ₹{{ number_format($approval->approved_amount, 2) }}</p>
+                        <p class="mb-0"><strong>Remarks:</strong> {{ $approval->remarks }}</p>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if($expense->rejections && $expense->rejections->isNotEmpty())
+            <hr>
+            <h6>Rejections</h6>
+            <div class="list-group mb-3">
+                @foreach($expense->rejections as $rejection)
+                    <div class="list-group-item border-danger">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>Rejected By:</strong> {{ $rejection->rejecter?->name ?? '-' }}
+                            </div>
+                            <span class="badge bg-danger text-capitalize">Rejected</span>
+                        </div>
+                        <p class="mb-1"><strong>Category:</strong> {{ $rejection->category?->title ?? '-' }}</p>
+                        <p class="mb-0"><strong>Remarks:</strong> {{ $rejection->remarks }}</p>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if($expense->queries && $expense->queries->isNotEmpty())
+            <hr>
+            <h6>Queries</h6>
+            <div class="list-group mb-3">
+                @foreach($expense->queries as $query)
+                    <div class="list-group-item border-warning">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>Raised By:</strong> {{ $query->requester?->name ?? '-' }}
+                            </div>
+                            <span class="badge bg-warning text-dark text-capitalize">{{ $query->status }}</span>
+                        </div>
+                        <p class="mb-1"><strong>Category:</strong> {{ $query->category?->title ?? '-' }}</p>
+                        <p class="mb-0"><strong>Remarks:</strong> {{ $query->remarks }}</p>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if($expense->comments && $expense->comments->isNotEmpty())
+            <hr>
+            <h6>Comments</h6>
+            <div class="list-group mb-3">
+                @foreach($expense->comments as $comment)
+                    <div class="list-group-item border-secondary">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>{{ $comment->user?->name ?? 'System' }}</strong>
+                            </div>
+                            <small class="text-muted">{{ $comment->created_at->format('Y-m-d H:i') }}</small>
+                        </div>
+                        <p class="mb-0">{{ $comment->comment }}</p>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
         @if($expense->attachments && $expense->attachments->isNotEmpty())
             <hr>
             <h6>Attachments</h6>

@@ -67,6 +67,7 @@
                         id="amount" name="amount"
                         value="{{ old('amount') }}">
                     @error('amount') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div id="budgetWarning" class="text-warning small mt-1" style="display:none;"></div>
                 </div>
             </div>
 
@@ -186,3 +187,36 @@
         </div>
     </form>
 @endsection
+
+@push('scripts')
+    <script>
+        const departmentBudgets = @json($departmentBudgets ?? []);
+
+        function updateBudgetWarning() {
+            const departmentId = document.getElementById('department_id')?.value;
+            const amount = parseFloat(document.getElementById('amount')?.value) || 0;
+            const warningEl = document.getElementById('budgetWarning');
+
+            if (!warningEl) {
+                return;
+            }
+
+            if (!departmentId || departmentBudgets[departmentId] === undefined) {
+                warningEl.style.display = 'none';
+                return;
+            }
+
+            const budgetRemaining = parseFloat(departmentBudgets[departmentId]);
+            if (amount > budgetRemaining) {
+                warningEl.style.display = 'block';
+                warningEl.textContent = `Warning: entered amount exceeds available budget for this month (₹${budgetRemaining.toFixed(2)} remaining).`;
+            } else {
+                warningEl.style.display = 'none';
+            }
+        }
+
+        document.getElementById('department_id')?.addEventListener('change', updateBudgetWarning);
+        document.getElementById('amount')?.addEventListener('input', updateBudgetWarning);
+        document.addEventListener('DOMContentLoaded', updateBudgetWarning);
+    </script>
+@endpush

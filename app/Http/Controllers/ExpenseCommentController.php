@@ -2,48 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Expense;
 use App\Models\ExpenseComments;
 use Illuminate\Http\Request;
 
 class ExpenseCommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(Request $request, Expense $expense)
     {
-        //
-    }
+        $data = $request->validate([
+            'comment' => ['required', 'string'],
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        ExpenseComments::create([
+            'expense_id' => $expense->id,
+            'user_id' => auth()->id(),
+            'comment' => $data['comment'],
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ExpenseComments $expenseComments)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ExpenseComments $expenseComments)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ExpenseComments $expenseComments)
-    {
-        //
+        return response()->json(['message' => 'Comment posted successfully.']);
     }
 }

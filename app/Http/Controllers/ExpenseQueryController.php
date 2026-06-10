@@ -2,48 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Expense;
 use App\Models\ExpenseQuery;
 use Illuminate\Http\Request;
 
 class ExpenseQueryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(Request $request, Expense $expense)
     {
-        //
-    }
+        $data = $request->validate([
+            'expense_query_category_id' => ['required', 'exists:expense_query_categories,id'],
+            'status' => ['required', 'in:open,awaiting_response,resolved'],
+            'remarks' => ['required', 'string'],
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $data['expense_id'] = $expense->id;
+        $data['requester_id'] = auth()->id();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ExpenseQuery $expenseQuery)
-    {
-        //
-    }
+        ExpenseQuery::create($data);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ExpenseQuery $expenseQuery)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ExpenseQuery $expenseQuery)
-    {
-        //
+        return response()->json(['message' => 'Query submitted successfully.']);
     }
 }

@@ -7,12 +7,14 @@ use App\Enums\ExpenseTypeEnum;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Department;
+use App\Models\DepartmentBudget;
 use App\Models\ExpenseCategory;
 use App\Models\Expense;
 use App\Models\ExpenseQueryCategory;
 use App\Models\ExpenseRejectionCategory;
 use App\Models\ExpenseRequestType;
 use App\Models\Vendor;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\DataTables;
@@ -41,11 +43,13 @@ class ExpenseController extends Controller
         $requestCategories   = ExpenseCategory::select(['id', 'title'])->get();
         $departments         = $this->getDepartments();
         $vendors             = Vendor::where('is_active', true)->get();
+        $departmentBudgets   = $this->buildBudgetMap($departments);
         return view('pages.expense.create', compact(
             'requestTypeOptions',
             'requestCategories',
             'departments',
-            'vendors'
+            'vendors',
+            'departmentBudgets'
         ));
     }
 
@@ -76,13 +80,15 @@ class ExpenseController extends Controller
         $requestCategories   = ExpenseCategory::select(['id', 'title'])->get();
         $departments         = $this->getDepartments();
         $vendors             = Vendor::where('is_active', true)->get();
+        $departmentBudgets   = $this->buildBudgetMap($departments);
 
         return view('pages.expense.edit', compact(
             'expense',
             'requestTypeOptions',
             'requestCategories',
             'departments',
-            'vendors'
+            'vendors',
+            'departmentBudgets'
         ));
     }
 
@@ -119,12 +125,43 @@ class ExpenseController extends Controller
         $queryCategories = ExpenseQueryCategory::select('id', 'title')->get();
         return view('pages.expense.pending-approvals', compact('rejectionCategories', 'queryCategories'));
     }
-    private function getDepartments()
+    private function getDepartments(): Collection
     {
         if (auth()->user()->hasRole(['super-admin', 'accounts'])) {
             return Department::all();
         }
-        return auth()->user()->department;
+
+        return Department::where('id', auth()->user()->department_id)->get();
+    }
+
+    private function buildBudgetMap($departments): array
+    {
+        if ($departments instanceof Department) {
+            $departments = collect([$departments]);
+        }
+
+        $year = now()->year;
+        $month = now()->month;
+
+        $approvedExpenseSums = Expense::where('status', ExpenseStatusEnum::APPROVED->value)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->groupBy('department_id')
+            ->selectRaw('department_id, SUM(amount) as total')
+            ->pluck('total', 'department_id')
+            ->toArray();
+
+        $budgetRecords = DepartmentBudget::where('year', $year)
+            ->where('month', $month)
+            ->whereIn('department_id', $departments->pluck('id'))
+            ->get()
+            ->keyBy('department_id');
+
+        return $departments->mapWithKeys(function ($department) use ($approvedExpenseSums, $budgetRecords) {
+            $budget = $budgetRecords->has($department->id) ? $budgetRecords->get($department->id)->amount : 0;
+            $approved = $approvedExpenseSums[$department->id] ?? 0;
+            return [$department->id => max(0, $budget - $approved)];
+        })->toArray();
     }
 
     private function handleAttachments(Request $request, Expense $expense): void

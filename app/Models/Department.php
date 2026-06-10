@@ -11,6 +11,12 @@ class Department extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'title',
+        'manager_id',
+        'budget',
+    ];
+
     public function staff(): HasMany
     {
         return $this->hasMany(User::class, 'department_id');
@@ -24,5 +30,10 @@ class Department extends Model
     public function expenses(): HasMany
     {
         return $this->hasMany(Expense::class, 'department_id');
+    }
+
+    public function budgets(): HasMany
+    {
+        return $this->hasMany(DepartmentBudget::class);
     }
 }

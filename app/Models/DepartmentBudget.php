@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ExpenseComments extends Model
+class DepartmentBudget extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'expense_id',
-        'user_id',
-        'comment',
+        'department_id',
+        'year',
+        'month',
+        'amount',
     ];
 
-    public function user(): BelongsTo
+    public function department(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Department::class);
     }
 }
